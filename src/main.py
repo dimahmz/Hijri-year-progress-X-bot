@@ -3,6 +3,15 @@ from datetime import datetime
 from hijridate import Gregorian
 import os
 import tweepy
+from typing import TypedDict
+
+
+class YearProgressPayload(TypedDict):
+    total_days: int
+    completed_days: int
+    left_days: int
+    year: int
+    percent : int 
 
 
 load_dotenv("src/.env.local")
@@ -12,8 +21,12 @@ consumer_secret = os.getenv("CONSUMER_KEY_SECRET")
 access_token = os.getenv("ACCESS_TOKEN")
 access_token_secret = os.getenv("ACCESS_TOKEN_SECRET")
 
+completed_bar_char = "█"
+incompleted_bar_char = "░"
+progress_bar_total_chars = 20
 
-def hijri_year_progress_percent():
+
+def hijri_year_progress():
     # get the current datetime
     today_datetime = datetime.now()
 
@@ -33,19 +46,62 @@ def hijri_year_progress_percent():
         30 + current_hijri_date.day
     # print(f"days_completed : {days_completed}")
 
-    # the perecent of the completed days in the current hijri year
-    percent = days_completed / days_of_current_hijri_year
-    return f"days_of_current_hijri_year : {days_of_current_hijri_year} \ndays_completed :{days_completed} \npercent {percent*100}"
+    # returns the current hijri year days and the completed days
+    hijri_year_progress_payload: YearProgressPayload = {
+        "total_days": days_of_current_hijri_year,
+        "completed_days": days_completed,
+        "left_days": days_of_current_hijri_year - days_completed,
+        "year": current_hijri_date.year,
+        "percent" : int((days_completed / days_of_current_hijri_year )*100)
+    }
+    return hijri_year_progress_payload
+
+# return the progress bar
 
 
-def main ():
+def progress_bar_genrator(total: int, completed: int) -> str:
+    # happens one time
+    if (total == completed):
+        return "[" + completed_bar_char * progress_bar_total_chars + "]"
+
+    # calculate chars' multipliers
+    completed_percent = completed/total
+    completed_multiplier = progress_bar_total_chars * completed_percent
+    incompleted_multiplier = progress_bar_total_chars - completed_multiplier
+
+    # chars of the progress bar
+    completed_section = completed_bar_char * int(completed_multiplier)
+    incompleted_section = incompleted_bar_char * int(incompleted_multiplier)
+
+    # the progress bar
+    progress_bar = "[{0}{1}]".format(incompleted_section, completed_section)
+
+    return progress_bar
+
+
+def teweet_text() -> str:
+    # payload for the the current year progress
+    year_progress_payload  : YearProgressPayload = hijri_year_progress()
+    # progress bar as a text
+    progress_bar = progress_bar_genrator(
+        year_progress_payload["total_days"], year_progress_payload["completed_days"])
+    # teweet lines
+    tweet_lines = [
+        f"سنة {year_progress_payload["year"]} : ",
+        f"\n{progress_bar}   % {year_progress_payload["percent"]}",
+        f"\nالأيام المتبقية :  {year_progress_payload["left_days"]}",
+    ]
+    tweet_text = "\n".join(tweet_lines)
+    return tweet_text
+
+
+def main():
     client = tweepy.Client(
         consumer_key=consumer_key, consumer_secret=consumer_secret,
         access_token=access_token, access_token_secret=access_token_secret
     )
-    percent_text = hijri_year_progress_percent()
     response = client.create_tweet(
-        text=percent_text
+        text=teweet_text()
     )
     print(f"https://twitter.com/user/status/{response.data['id']}")
 
