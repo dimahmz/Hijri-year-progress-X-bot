@@ -11,7 +11,7 @@ class YearProgressPayload(TypedDict):
     completed_days: int
     left_days: int
     year: int
-    percent : int 
+    percent: int
 
 
 load_dotenv("src/.env.local")
@@ -23,7 +23,7 @@ access_token_secret = os.getenv("ACCESS_TOKEN_SECRET")
 
 completed_bar_char = "█"
 incompleted_bar_char = "░"
-progress_bar_total_chars = 20
+progress_bar_total_chars = 27
 
 
 def hijri_year_progress():
@@ -52,7 +52,7 @@ def hijri_year_progress():
         "completed_days": days_completed,
         "left_days": days_of_current_hijri_year - days_completed,
         "year": current_hijri_date.year,
-        "percent" : int((days_completed / days_of_current_hijri_year )*100)
+        "percent": int((days_completed / days_of_current_hijri_year)*100)
     }
     return hijri_year_progress_payload
 
@@ -74,22 +74,23 @@ def progress_bar_genrator(total: int, completed: int) -> str:
     incompleted_section = incompleted_bar_char * int(incompleted_multiplier)
 
     # the progress bar
-    progress_bar = "[{0}{1}]".format(incompleted_section, completed_section)
+    progress_bar = "║{0}{1}║".format(completed_section, incompleted_section)
 
     return progress_bar
 
 
 def teweet_text() -> str:
     # payload for the the current year progress
-    year_progress_payload  : YearProgressPayload = hijri_year_progress()
+    year_progress_payload: YearProgressPayload = hijri_year_progress()
     # progress bar as a text
     progress_bar = progress_bar_genrator(
         year_progress_payload["total_days"], year_progress_payload["completed_days"])
     # teweet lines
     tweet_lines = [
-        f"سنة {year_progress_payload["year"]} : ",
-        f"\n{progress_bar}   % {year_progress_payload["percent"]}",
-        f"\nالأيام المتبقية :  {year_progress_payload["left_days"]}",
+        f"السنة الهجرية {year_progress_payload["year"]}",
+        f"\n{progress_bar}",
+        f"\n% {year_progress_payload["percent"]} مكتمل",
+        f"{year_progress_payload["left_days"]} يوم متبقي",
     ]
     tweet_text = "\n".join(tweet_lines)
     return tweet_text
