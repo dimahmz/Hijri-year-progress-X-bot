@@ -5,7 +5,7 @@ from hijri_year_progress import HijriYearProgress
 from tweet_text import teweet_text_generator
 from progress_bar import generate_progress_bar
 from datetime import datetime
-
+from logger import logger 
 
 
 
@@ -33,7 +33,7 @@ def main():
         wait_on_rate_limit=True
     )
     # instanciate a new hijri year progress
-    hijri_year_progress = HijriYearProgress(datetime(2024,12,18))
+    hijri_year_progress = HijriYearProgress()
 
     # generate a new tweet for the that hijri year 
     tweet_text = teweet_text_generator(hijri_year_progress)
@@ -47,8 +47,8 @@ def main():
         text=tweet_text,
         media_ids=[media_id]
     )
-    print(f"https://twitter.com/user/status/{response.data['id']}")
-
+    url= f"https://twitter.com/user/status/{response.data['id']}"
+    logger.info(f" a new tweet has been at : {datetime.now()} : link : {url}")
 
 if __name__ == "__main__":
     main()
