@@ -14,6 +14,7 @@ import time
 
 
 load_dotenv("src/.env.local")
+print("hi")
 
 consumer_key = os.getenv("CONSUMER_KEY")
 consumer_secret = os.getenv("CONSUMER_KEY_SECRET")
@@ -89,5 +90,6 @@ def main():
 if __name__ == "__main__":
     four_hours = 60*60*4
     while True:
+        print("app has been started")
         main()
         time.sleep(four_hours)
