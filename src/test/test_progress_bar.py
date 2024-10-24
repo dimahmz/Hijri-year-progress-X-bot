@@ -1,17 +1,13 @@
 import os
 from datetime import datetime
-from PIL import Image, ImageDraw
 import unittest
 import glob
-import sys
-
-sys.path.insert(0, 'src')
 from progress_bar import generate_progress_bar
+import sys
+sys.path.insert(0, '..')
 
 
-
-
-class TestStringMethods(unittest.TestCase):
+class TestProgressBarMethods(unittest.TestCase):
     def test_progress_bar_result(self):
         files = glob.glob(fr"test\media\*")
         for f in files:
