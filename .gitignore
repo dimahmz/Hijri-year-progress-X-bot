@@ -6,5 +6,6 @@ Dockerfile
 .env
 *.local.*
 /media
-test/media/*
+src/test/media/*
 src/logs
+tweets.db
