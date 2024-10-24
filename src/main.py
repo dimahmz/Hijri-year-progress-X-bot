@@ -13,8 +13,7 @@ from decider import allow_the_bot_to_tweet
 import time
 
 
-load_dotenv("src/.env.local")
-print("hi")
+load_dotenv(".env")
 
 consumer_key = os.getenv("CONSUMER_KEY")
 consumer_secret = os.getenv("CONSUMER_KEY_SECRET")
@@ -66,7 +65,6 @@ def main():
 
         url = f"https://x.com/user/status/{post_id}"
 
-        print(post_id)
         new_tweet = Tweet(post_id=post_id,post_link=url, progress_percent=int(
             hijri_year_progress.percent), posted_at=date.today())
 
@@ -90,6 +88,7 @@ def main():
 if __name__ == "__main__":
     four_hours = 60*60*4
     while True:
-        print("app has been started")
+        print("App has been started")
+        error_logger.error("App has been started")
         main()
         time.sleep(four_hours)
