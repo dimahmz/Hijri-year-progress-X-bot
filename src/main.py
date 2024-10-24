@@ -10,6 +10,7 @@ from db.tweets_db import TweetsDB
 from tweet_text import teweet_text_generator
 from progress_bar import generate_progress_bar
 from decider import allow_the_bot_to_tweet
+import time
 
 
 load_dotenv("src/.env.local")
@@ -84,5 +85,9 @@ def main():
         return False
 
 
+
 if __name__ == "__main__":
-    main()
+    four_hours = 60*60*4
+    while True:
+        main()
+        time.sleep(four_hours)
