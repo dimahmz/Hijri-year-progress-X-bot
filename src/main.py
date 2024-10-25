@@ -86,9 +86,12 @@ def main():
 
 
 if __name__ == "__main__":
-    four_hours = 60*60*4
+    print("App has been started")
+    info_logger.info("App has been started")
+    five_minutes = 60*5
+    iteration = 0
     while True:
-        print("App has been started")
-        error_logger.error("App has been started")
+        iteration+=1
+        print(f"iterating number : {iteration}")
         main()
-        time.sleep(four_hours)
+        time.sleep(five_minutes)
