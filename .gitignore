@@ -7,5 +7,6 @@ Dockerfile
 *.local.*
 /media
 src/test/media/*
-src/logs
+src/logs/test
+src/logs/dev
 tweets.db
