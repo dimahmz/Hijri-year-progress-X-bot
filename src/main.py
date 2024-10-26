@@ -32,7 +32,7 @@ def main():
     if (is_allowed == False):
         debug_logger.debug(f"The bot is not allowed to tweet hijri_year_progress : {hijri_year_progress}")
         return False
-    
+
     # generate a new tweet for the that hijri year
     tweet_text = teweet_text_generator(hijri_year_progress)
 
@@ -65,33 +65,34 @@ def main():
 
         url = f"https://x.com/user/status/{post_id}"
 
-        new_tweet = Tweet(post_id=post_id,post_link=url, progress_percent=int(
-            hijri_year_progress.percent), posted_at=date.today(), hijri_year=hijri_year_progress.year)
+        new_tweet = Tweet(post_id=post_id, post_link=url, percent=int(
+            hijri_year_progress.percent), posted_at=datetime.now().isoformat(), hijri_year=hijri_year_progress.year)
 
         # store the tweet in a remote database
-        TweetsDB.insert_new_tweet(new_tweet)
+        tweetsDB = TweetsDB()
         
+        tweetsDB.insert_new_tweet(new_tweet)
+
         # log to ensure everything is working
         info_logger.info(f""" a new tweet has been posted at : {
-                    datetime.now()} : link : {url}: tweet : {new_tweet}""")
+            datetime.now()} : link : {url}: tweet : {new_tweet}""")
 
         return True
 
     except Exception as e:
         # logging the error
-        error_logger.error(f"an error has occured {e}")
+        error_logger.error(f"An error has occurred {e}")
         # @TODO : send the admin a message
         return False
-
 
 
 if __name__ == "__main__":
     print("App has been started")
     info_logger.info("App has been started")
-    one_hour = 60*60
+    four_hour = 60*60*4
     iteration = 0
     while True:
-        iteration+=1
+        iteration += 1
         print(f"iterating number : {iteration}")
         main()
-        time.sleep(one_hour)
+        time.sleep(four_hour)
