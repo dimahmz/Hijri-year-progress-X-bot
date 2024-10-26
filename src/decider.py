@@ -1,11 +1,14 @@
 from hijri_year_progress import HijriYearProgress
-from db.tweets_db import TweetsDB
+from db.remote_tweets_db import TweetsDB
 
 
-def allow_the_bot_to_tweet(new_hijri_year_progress: HijriYearProgress) -> bool:
+def allow_the_bot_to_tweet(new_hijri_year_progress: HijriYearProgress, tweets_db : TweetsDB =None) -> bool:
     try:
+        #production use
+        if(tweets_db==None) :
+            tweets_db = TweetsDB()
         # get the last tweet
-        percent = TweetsDB.get_percent_in_last_tweet()
+        percent = tweets_db.get_percent_in_last_tweet()
     except:
         # database in empty
         # an error in my code
