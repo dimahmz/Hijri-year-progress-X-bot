@@ -1,11 +1,23 @@
 import logging
 import os
+from dotenv import load_dotenv
+
+load_dotenv(".env")
+
+
+environment = os.getenv("ENVIRONMENT")
+
+logs_folder = "src/logs/prod"
+
+if (environment == "development"):
+    logs_folder = "src/logs/dev"
+elif (environment == "test"):
+    logs_folder = "src/logs/test"
 
 # Create the logs directory if it doesn't exist
-os.makedirs('src/logs', exist_ok=True)
+os.makedirs(logs_folder, exist_ok=True)
 
 # Function to create a logger
-
 
 def setup_logger(name, log_file, level):
     handler = logging.FileHandler(log_file)
@@ -22,10 +34,11 @@ def setup_logger(name, log_file, level):
 
 
 # Create separate loggers
-info_logger = setup_logger('info_logger', 'src/logs/info.log', logging.INFO)
+
+info_logger = setup_logger('info_logger', f'{logs_folder}/info.log', logging.INFO)
 debug_logger = setup_logger(
-    'debug_logger', 'src/logs/debug.log', logging.DEBUG)
+    'debug_logger', f'{logs_folder}/debug.log', logging.DEBUG)
 error_logger = setup_logger(
-    'error_logger', 'src/logs/errors.log', logging.ERROR)
+    'error_logger', f'{logs_folder}/errors.log', logging.ERROR)
 warning_logger = setup_logger(
-    'warning_logger', 'src/logs/warnings.log', logging.WARNING)
+    'warning_logger', f'{logs_folder}/warnings.log', logging.WARNING)
