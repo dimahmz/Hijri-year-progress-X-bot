@@ -5,24 +5,35 @@ from hijri_year_progress import HijriYearProgress
 from datetime import datetime
 from logger import *
 from db.models.tweet import Tweet
-from datetime import date
 from db.remote_tweets_db import TweetsDB
 from tweet_text import teweet_text_generator
 from progress_bar import generate_progress_bar
 from decider import allow_the_bot_to_tweet
-import time
 
 
-load_dotenv(".env")
 
-consumer_key = os.getenv("CONSUMER_KEY")
-consumer_secret = os.getenv("CONSUMER_KEY_SECRET")
-access_token = os.getenv("ACCESS_TOKEN")
-access_token_secret = os.getenv("ACCESS_TOKEN_SECRET")
-bearer_token = os.getenv("bearer_token")
 
 
 def main():
+    # environment set up
+    load_dotenv(".env")  
+    environment = os.getenv("ENVIRONMENT")
+    prefix = ""
+
+    # load test environment if the bot isn't in production
+    if (environment != "production"):
+        load_dotenv(".env.test")
+        prefix = "TEST_"
+
+
+    consumer_key = os.getenv(f"{prefix}CONSUMER_KEY")
+    consumer_secret = os.getenv(f"{prefix}CONSUMER_KEY_SECRET")
+    access_token = os.getenv(f"{prefix}ACCESS_TOKEN")
+    access_token_secret = os.getenv(f"{prefix}ACCESS_TOKEN_SECRET")
+    bearer_token = os.getenv(f"{prefix}bearer_token")
+    url = os.getenv(f"{prefix}SUPABASE_URL")
+    key = os.getenv(f"{prefix}SUPABASE_KEY")
+
     # instanciate a new hijri year progress
     hijri_year_progress = HijriYearProgress()
 
@@ -30,7 +41,8 @@ def main():
     is_allowed = allow_the_bot_to_tweet(hijri_year_progress)
 
     if (is_allowed == False):
-        debug_logger.debug(f"The bot is not allowed to tweet hijri_year_progress : {hijri_year_progress}")
+        debug_logger.debug(f"The bot is not allowed to tweet hijri_year_progress : {
+                           hijri_year_progress}")
         return False
 
     # generate a new tweet for the that hijri year
@@ -60,22 +72,21 @@ def main():
             text=tweet_text,
             media_ids=[media_id]
         )
-
         post_id = response.data['id']
 
         url = f"https://x.com/user/status/{post_id}"
 
+        # new tweet object
         new_tweet = Tweet(post_id=post_id, post_link=url, percent=int(
-            hijri_year_progress.percent), posted_at=datetime.now().isoformat(), hijri_year=hijri_year_progress.year)
+            hijri_year_progress.percent), hijri_year=hijri_year_progress.year)
 
+        tweetsDB = TweetsDB(url=url, key=key)
         # store the tweet in a remote database
-        tweetsDB = TweetsDB()
-        
-        tweetsDB.insert_new_tweet(new_tweet)
+        new_tweet_row = tweetsDB.insert_new_tweet(new_tweet)
 
         # log to ensure everything is working
-        info_logger.info(f""" a new tweet has been posted at : {
-            datetime.now()} : link : {url}: tweet : {new_tweet}""")
+        info_logger.info(f""" A new tweet has been posted at : {
+            datetime.now()} : link : {url}: tweet : {new_tweet_row}""")
 
         return True
 
@@ -87,12 +98,5 @@ def main():
 
 
 if __name__ == "__main__":
-    print("App has been started")
-    info_logger.info("App has been started")
-    four_hour = 60*60*4
-    iteration = 0
-    while True:
-        iteration += 1
-        print(f"iterating number : {iteration}")
-        main()
-        time.sleep(four_hour)
+    print("The bot is trying to tweet")
+    main()
