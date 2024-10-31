@@ -4,9 +4,10 @@ __pycache__/
 Dockerfile
 .env.local
 .env
+.env.test
 *.local.*
 /media
 src/test/media/*
-src/logs/test
 src/logs/dev
+src/logs/test
 tweets.db
