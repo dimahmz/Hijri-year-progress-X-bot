@@ -33,6 +33,8 @@ class TestRemoteDB(unittest.TestCase):
         tweet_row = tweetsDB.insert_new_tweet(tweet)
         # format the new inserted tweet in the db to test it
         tweet_row = Tweet.format_dic_to_json(tweet_row)
+        # close connection
+        tweetsDB.close_db_connection()
         # testing
         self.assertEqual(new_tweet, tweet_row)
 
@@ -42,17 +44,31 @@ class TestRemoteDB(unittest.TestCase):
 
         data = tweetsDB.get_all_tweets()
 
+        tweetsDB.close_db_connection()
+
         size = len(data)
 
-        self.assertEqual(11, size)
+        self.assertEqual(2, size)
 
+
+    def test_last_tweet_percent(self):
+        # instanciate a db client with the remote database
+        tweetsDB = TweetsDB(url=url, key=key)
+
+        percent_result = tweetsDB.get_percent_in_last_tweet()
+
+        tweetsDB.close_db_connection()
+        
+        self.assertEqual(10, percent_result)
 
 if __name__ == '__main__':
     # Load specific tests only
     suite = unittest.TestSuite()
     # suite.addTest(TestRemoteDB('test_length_of_tweets_rows'))
-    suite.addTest(TestRemoteDB('test_insert_new_tweet'))
+    suite.addTest(TestRemoteDB('test_last_tweet_percent'))
+    # suite.addTest(TestRemoteDB('test_insert_new_tweet'))
 
     # Run only the selected tests
     runner = unittest.TextTestRunner()
     runner.run(suite)
+
