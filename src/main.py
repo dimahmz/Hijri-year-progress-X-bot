@@ -11,12 +11,9 @@ from progress_bar import generate_progress_bar
 from decider import allow_the_bot_to_tweet
 
 
-
-
-
 def main():
     # environment set up
-    load_dotenv(".env")  
+    load_dotenv(".env")
     environment = os.getenv("ENVIRONMENT")
     prefix = ""
 
@@ -24,8 +21,8 @@ def main():
     if (environment != "production"):
         load_dotenv(".env.test")
         prefix = "TEST_"
-
-
+        
+    # environment variables
     consumer_key = os.getenv(f"{prefix}CONSUMER_KEY")
     consumer_secret = os.getenv(f"{prefix}CONSUMER_KEY_SECRET")
     access_token = os.getenv(f"{prefix}ACCESS_TOKEN")
@@ -59,7 +56,7 @@ def main():
             bearer_token,
             consumer_key, consumer_secret,
             access_token, access_token_secret,
-            wait_on_rate_limit=True
+            wait_on_rate_limit=False
         )
 
         # generate a progress image bar the that hijri year
@@ -81,12 +78,17 @@ def main():
             hijri_year_progress.percent), hijri_year=hijri_year_progress.year)
 
         tweetsDB = TweetsDB(url=url, key=key)
+
+
         # store the tweet in a remote database
         new_tweet_row = tweetsDB.insert_new_tweet(new_tweet)
 
+        # close db connection
+        tweetsDB.close_db_connection()
+
         # log to ensure everything is working
-        info_logger.info(f""" A new tweet has been posted at : {
-            datetime.now()} : link : {url}: tweet : {new_tweet_row}""")
+        info_logger.info(f"""A new tweet has been posted at : {
+                         datetime.now()} : new_tweet : {new_tweet_row}:""")
 
         return True
 
@@ -100,3 +102,4 @@ def main():
 if __name__ == "__main__":
     print("The bot is trying to tweet")
     main()
+    print("Finished execution")

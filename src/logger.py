@@ -40,5 +40,4 @@ debug_logger = setup_logger(
     'debug_logger', f'{logs_folder}/debug.log', logging.DEBUG)
 error_logger = setup_logger(
     'error_logger', f'{logs_folder}/errors.log', logging.ERROR)
-warning_logger = setup_logger(
-    'warning_logger', f'{logs_folder}/warnings.log', logging.WARNING)
+warning_logger = setup_logger('warning_logger', f'{logs_folder}/warnings.log', logging.WARNING)

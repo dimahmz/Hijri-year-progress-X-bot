@@ -25,7 +25,7 @@ def allow_the_bot_to_tweet(new_hijri_year_progress: HijriYearProgress, tweets_db
             tweets_db = TweetsDB(key=key, url=url)
         # get the last tweet
         percent = tweets_db.get_percent_in_last_tweet()
-    except:
+    except Exception as e:
         # database in empty
         # an error in my code
         return False
