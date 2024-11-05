@@ -38,8 +38,7 @@ def main():
     is_allowed = allow_the_bot_to_tweet(hijri_year_progress)
 
     if (is_allowed == False):
-        debug_logger.debug(f"The bot is not allowed to tweet hijri_year_progress : {
-                           hijri_year_progress}")
+        debug_logger.debug(f"The bot is not allowed to tweet hijri_year_progress : {hijri_year_progress}")
         return False
 
     # generate a new tweet for the that hijri year
@@ -64,18 +63,20 @@ def main():
 
         media_id = api.media_upload(filename).media_id_string
 
+        
         # create the tweet
         response = client.create_tweet(
             text=tweet_text,
             media_ids=[media_id]
         )
+        
         post_id = response.data['id']
 
-        url = f"https://x.com/user/status/{post_id}"
+        post_link = f"https://x.com/user/status/{post_id}"
 
         # new tweet object
-        new_tweet = Tweet(post_id=post_id, post_link=url, percent=int(
-            hijri_year_progress.percent), hijri_year=hijri_year_progress.year)
+        new_tweet = Tweet(hijri_year=hijri_year_progress.year, percent=int(
+            hijri_year_progress.percent), post_id=post_id, post_link=post_link)
 
         tweetsDB = TweetsDB(url=url, key=key)
 
