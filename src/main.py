@@ -10,6 +10,10 @@ from db.remote_tweets_db import TweetsDB
 from tweet_text import teweet_text_generator
 from progress_bar import generate_progress_bar
 from decider import allow_the_bot_to_tweet
+import inspect
+
+
+relative_path = os.path.relpath(__file__)
 
 
 def main():
@@ -44,11 +48,13 @@ def main():
 
     if (is_allowed == False):
         # debug message
-        message = f"The bot is not allowed to tweet hijri_year_progress : {hijri_year_progress}"
+        message = f"The bot is not allowed to tweet hijri_year_progress : {
+            hijri_year_progress}"
         # log locally
         debug_logger.debug(message)
         # log remotely
-        log = Log(pathname="src/main.py", lineno=51, logged_at=datetime.now().isoformat(), message=message)
+        line_number = inspect.currentframe().f_lineno + 2
+        log = Log(pathname=relative_path, lineno=line_number, message=message)
         tweetsDB.log_to_remote_db(type="debug", log=log)
         return False
 
@@ -74,7 +80,6 @@ def main():
 
         media_id = api.media_upload(filename).media_id_string
 
-        
         # create the tweet
         response = client.create_tweet(
             text=tweet_text,
@@ -92,23 +97,27 @@ def main():
         # store the tweet in a remote database
         new_tweet_row = tweetsDB.insert_new_tweet(new_tweet)
 
-        message  = f"A new tweet has been posted at : {datetime.now()} : new_tweet : {new_tweet_row}"
+        message = f"A new tweet has been posted at : {datetime.now()} : new_tweet : {
+            new_tweet_row}"
 
         # log to ensure everything is working
         info_logger.info(message)
 
-        # close db connection
-        log = Log(pathname="src/main.py", lineno=96, logged_at=datetime.now().isoformat(), message=message)
-
+        # log in the remote database
+        line_number = inspect.currentframe().f_lineno + 2
+        log = Log(pathname=relative_path, lineno=line_number, message=message)
         tweetsDB.log_to_remote_db(type="info", log=log)
 
         return True
 
     except Exception as e:
         # logging the error
-        error_message = f"An error has occurred {e}"
+        error_message = f"Error : {e}"
         error_logger.error(error_message)
-        log = Log(pathname="src/main.py", lineno=106, logged_at=datetime.now().isoformat(), message=error_message)
+        # logging remotely
+        line_number = inspect.currentframe().f_lineno + 2
+        log = Log(pathname=relative_path,
+                  lineno=line_number, message=error_message)
         tweetsDB.log_to_remote_db(type="error", log=log)
 
         # @TODO : send the admin a message

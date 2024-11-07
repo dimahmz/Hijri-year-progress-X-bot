@@ -1,8 +1,11 @@
 from hijri_year_progress import HijriYearProgress
 from db.remote_tweets_db import TweetsDB
+from db.models.log import Log
 from dotenv import load_dotenv
 import os
+import inspect
 
+relative_path = os.path.relpath(__file__)
 
 load_dotenv(".env")
 
@@ -26,6 +29,10 @@ def allow_the_bot_to_tweet(new_hijri_year_progress: HijriYearProgress, tweets_db
         # get the last tweet
         percent = tweets_db.get_percent_in_last_tweet()
     except Exception as e:
+        line_number = inspect.currentframe().f_lineno
+        log = Log(message=e, pathname=relative_path, lineno=line_number)
+
+        tweets_db.log_to_remote_db(type="error", log=log)
         # database in empty
         # an error in my code
         return False
