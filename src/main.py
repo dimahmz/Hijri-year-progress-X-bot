@@ -5,6 +5,7 @@ from hijri_year_progress import HijriYearProgress
 from datetime import datetime
 from logger import *
 from db.models.tweet import Tweet
+from db.models.log import Log
 from db.remote_tweets_db import TweetsDB
 from tweet_text import teweet_text_generator
 from progress_bar import generate_progress_bar
@@ -21,7 +22,7 @@ def main():
     if (environment != "production"):
         load_dotenv(".env.test")
         prefix = "TEST_"
-        
+
     # environment variables
     consumer_key = os.getenv(f"{prefix}CONSUMER_KEY")
     consumer_secret = os.getenv(f"{prefix}CONSUMER_KEY_SECRET")
@@ -37,8 +38,18 @@ def main():
     # decide whether the bot can tweet or not
     is_allowed = allow_the_bot_to_tweet(hijri_year_progress)
 
+    # TODO:
+    # what if this throw an error
+    tweetsDB = TweetsDB(url=url, key=key)
+
     if (is_allowed == False):
-        debug_logger.debug(f"The bot is not allowed to tweet hijri_year_progress : {hijri_year_progress}")
+        # debug message
+        message = f"The bot is not allowed to tweet hijri_year_progress : {hijri_year_progress}"
+        # log locally
+        debug_logger.debug(message)
+        # log remotely
+        log = Log(pathname="src/main.py", lineno=51, logged_at=datetime.now().isoformat(), message=message)
+        tweetsDB.log_to_remote_db(type="debug", log=log)
         return False
 
     # generate a new tweet for the that hijri year
@@ -69,7 +80,7 @@ def main():
             text=tweet_text,
             media_ids=[media_id]
         )
-        
+
         post_id = response.data['id']
 
         post_link = f"https://x.com/user/status/{post_id}"
@@ -78,26 +89,33 @@ def main():
         new_tweet = Tweet(hijri_year=hijri_year_progress.year, percent=int(
             hijri_year_progress.percent), post_id=post_id, post_link=post_link)
 
-        tweetsDB = TweetsDB(url=url, key=key)
-
-
         # store the tweet in a remote database
         new_tweet_row = tweetsDB.insert_new_tweet(new_tweet)
 
-        # close db connection
-        tweetsDB.close_db_connection()
+        message  = f"A new tweet has been posted at : {datetime.now()} : new_tweet : {new_tweet_row}"
 
         # log to ensure everything is working
-        info_logger.info(f"""A new tweet has been posted at : {
-                         datetime.now()} : new_tweet : {new_tweet_row}:""")
+        info_logger.info(message)
+
+        # close db connection
+        log = Log(pathname="src/main.py", lineno=96, logged_at=datetime.now().isoformat(), message=message)
+
+        tweetsDB.log_to_remote_db(type="info", log=log)
 
         return True
 
     except Exception as e:
         # logging the error
-        error_logger.error(f"An error has occurred {e}")
+        error_message = f"An error has occurred {e}"
+        error_logger.error(error_message)
+        log = Log(pathname="src/main.py", lineno=106, logged_at=datetime.now().isoformat(), message=error_message)
+        tweetsDB.log_to_remote_db(type="error", log=log)
+
         # @TODO : send the admin a message
         return False
+    finally:
+        # close db connection
+        tweetsDB.close_db_connection()
 
 
 if __name__ == "__main__":
