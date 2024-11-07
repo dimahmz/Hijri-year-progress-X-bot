@@ -43,9 +43,13 @@ def main():
     tweetsDB = TweetsDB(url=url, key=key)
 
     if (is_allowed == False):
-        debug_logger.debug(f"""The bot is not allowed to tweet hijri_year_progress : {
-                           hijri_year_progress}""")
-
+        # debug message
+        message = f"The bot is not allowed to tweet hijri_year_progress : {hijri_year_progress}"
+        # log locally
+        debug_logger.debug(message)
+        # log remotely
+        log = Log(pathname="src/main.py", lineno=51, logged_at=datetime.now().isoformat(), message=message)
+        tweetsDB.log_to_remote_db(type="debug", log=log)
         return False
 
     # generate a new tweet for the that hijri year
@@ -101,7 +105,11 @@ def main():
 
     except Exception as e:
         # logging the error
-        error_logger.error(f"An error has occurred {e}")
+        error_message = f"An error has occurred {e}"
+        error_logger.error(error_message)
+        log = Log(pathname="src/main.py", lineno=106, logged_at=datetime.now().isoformat(), message=error_message)
+        tweetsDB.log_to_remote_db(type="error", log=log)
+
         # @TODO : send the admin a message
         return False
     finally:

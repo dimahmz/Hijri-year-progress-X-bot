@@ -22,11 +22,20 @@ class Log:
         return log
 
     @staticmethod
-    def format_dic_to_json(tweet):
+    def format_str_to_test(new_log : str):
         log = {
-            "message": tweet["message"],
-            "pathname": tweet["pathname"],
-            "lineno": tweet["lineno"],
-            "logged_at": tweet["logged_at"],
+            "message": new_log["message"],
+            "pathname": new_log["pathname"],
+            "lineno": new_log["lineno"],
+            "logged_at": new_log["logged_at"],
+        }
+        return log
+
+    def format_to_test(self):
+        log = {
+            "message": self.message,
+            "pathname": self.pathname,
+            "lineno": self.lineno,
+            "logged_at": self.logged_at,
         }
         return log

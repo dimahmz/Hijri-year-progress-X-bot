@@ -50,10 +50,14 @@ class TweetsDB:
         try : 
             log = log.format_to_insert_in_db()
             table_name = f"{type}s"
+            # plural exception 
+            if(type=="info"):
+                table_name = type
             response = (self.supabase.table(table_name).insert(log).execute())
             return response.data[0]
         except Exception as e:
             print(e)
+            return False
  
     def close_db_connection(self):
         self.supabase.auth.sign_out()
