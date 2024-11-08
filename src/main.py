@@ -119,7 +119,8 @@ def main():
         log = Log(pathname=relative_path,
                   lineno=line_number, message=error_message)
         tweetsDB.log_to_remote_db(type="error", log=log)
-
+        # log in the console
+        print("Error occurred check logs")
         # @TODO : send the admin a message
         return False
     finally:

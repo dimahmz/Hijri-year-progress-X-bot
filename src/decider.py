@@ -35,6 +35,8 @@ def allow_the_bot_to_tweet(new_hijri_year_progress: HijriYearProgress, tweets_db
         tweets_db.log_to_remote_db(type="error", log=log)
         # database in empty
         # an error in my code
+        # log in the console
+        print("Error occurred check logs")
         return False
 
     # should not tweet the same percentage twice
