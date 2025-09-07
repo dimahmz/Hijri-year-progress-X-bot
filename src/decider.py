@@ -28,6 +28,7 @@ def allow_the_bot_to_tweet(new_hijri_year_progress: HijriYearProgress, tweets_db
             tweets_db = TweetsDB(key=key, url=url)
         # get the last tweet
         percent = tweets_db.get_percent_in_last_tweet()
+        hijri_year = tweets_db.get_year_in_last_tweet()
     except Exception as e:
         line_number = inspect.currentframe().f_lineno
         log = Log(message=e, pathname=relative_path, lineno=line_number)
@@ -38,6 +39,10 @@ def allow_the_bot_to_tweet(new_hijri_year_progress: HijriYearProgress, tweets_db
         # log in the console
         print("Error occurred check logs")
         return False
+    
+    # the year has changed, so we can tweet
+    if(new_hijri_year_progress.hijri_year > hijri_year):
+        return True
 
     # should not tweet the same percentage twice
     if (percent == int(new_hijri_year_progress.percent)):

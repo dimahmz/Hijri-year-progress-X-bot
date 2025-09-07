@@ -48,8 +48,7 @@ def main():
 
     if (is_allowed == False):
         # debug message
-        message = f"The bot is not allowed to tweet hijri_year_progress : {
-            hijri_year_progress}"
+        message = f"The bot is not allowed to tweet hijri_year_progress : {hijri_year_progress}"
         # log locally
         debug_logger.debug(message)
         # log remotely
@@ -97,8 +96,7 @@ def main():
         # store the tweet in a remote database
         new_tweet_row = tweetsDB.insert_new_tweet(new_tweet)
 
-        message = f"A new tweet has been posted at : {datetime.now()} : new_tweet : {
-            new_tweet_row}"
+        message = f"A new tweet has been posted at : {datetime.now()} : new_tweet : {new_tweet_row}"
 
         # log to ensure everything is working
         info_logger.info(message)

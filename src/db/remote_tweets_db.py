@@ -43,6 +43,20 @@ class TweetsDB:
 
         return response.data[0]["percent"]
 
+    def get_year_in_last_tweet(self):
+        response = self.supabase.table("tweets").select(
+            "*").order("created_at", desc=True).limit(1).execute()
+        # TODO:
+        # error cases to handle :
+        # server error
+        # table doesn't exist
+
+        # table is empty
+        if (len(response.data) == 0):
+            return 0
+
+        return response.data[0]["hijri_year"]
+
     def log_to_remote_db(self, type: Literal["error", "info", "debug", "warning"], log: Log):
         # TODO:
         # handle errors
